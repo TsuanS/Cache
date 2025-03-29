@@ -318,7 +318,7 @@ void KLfuCache<Key, Value>::updateMinFreq()
 
 // 并没有牺牲空间换时间，他是把原有缓存大小进行了分片。
 template<typename Key, typename Value>
-class KHashLfuCache
+class KHashLfuCache: public KICachePolicy<Key, Value>
 {
 public:
     KHashLfuCache(size_t capacity, int sliceNum, int maxAverageNum = 10)
@@ -377,4 +377,5 @@ private:
 };
 
 } // namespace KamaCache
+
 

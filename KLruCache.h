@@ -235,7 +235,7 @@ private:
 
 // lru优化：对lru进行分片，提高高并发使用的性能
 template<typename Key, typename Value>
-class KHashLruCaches
+class KHashLruCaches : public KICachePolicy<Key, Value>
 {
 public:
     // 构造函数，初始化缓存容量和切片数量
@@ -291,7 +291,7 @@ private:
 
 // Hash 分片优化后的 KLruKCache
 template<typename Key, typename Value>
-class KHashLruKCache
+class KHashLruKCache : public KICachePolicy<Key, Value>
 {
 public:
     KHashLruKCache(int capacity, int historyCapacity, int k, int sliceNum)
@@ -317,10 +317,11 @@ public:
     }
 
     // 从对应分片获取数据
-    bool get(Key key, Value& value)
+    bool get(Key key, Value& value) override
     {
         size_t sliceIndex = Hash(key) % sliceNum_;
-        return lruSliceCaches_[sliceIndex]->get(key, value);
+        value = lruSliceCaches_[sliceIndex]->get(key);
+        return !value.empty(); // 或者根据实际情况返回适当的布尔值
     }
 
     Value get(Key key)

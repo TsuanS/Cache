@@ -45,21 +45,18 @@ void printResults(const std::string& testName, int capacity,
               << (100.0 * hits[6] / get_operations[6]) << "%" << std::endl;
 }
 
-void testHotDataAccess() {
+void testHotDataAccess(const int CAPACITY, const int OPERATIONS,const int HOT_KEYS,const int COLD_KEYS,int sliceNum,const int k1,const int historyCapacity1,const int k2,const int historyCapacity2) {
     std::cout << "\n=== 测试场景1：热点数据访问测试 ===" << std::endl;
     
-    const int CAPACITY = 50;  // 增加缓存容量
-    const int OPERATIONS = 500000;  // 增加操作次数
-    const int HOT_KEYS = 20;   // 增加热点数据的数量
-    const int COLD_KEYS = 5000;        
+ 
     
     KamaCache::KLruCache<int, std::string> lru(CAPACITY);
     KamaCache::KLfuCache<int, std::string> lfu(CAPACITY);
     KamaCache::KArcCache<int, std::string> arc(CAPACITY);
-    KamaCache::KLruKCache<int, std::string> lruk(CAPACITY, 10, 3); // 假设 historyCapacity=10, k=3
-    KamaCache::KHashLruCaches<int, std::string> hash_lru(CAPACITY, 4); // 假设分片数量=4
-    KamaCache::KHashLruKCache<int, std::string> hash_lruk(CAPACITY, 10, 3, 4); // 假设 historyCapacity=10, k=3, 分片数量=4
-    KamaCache::KHashLfuCache<int, std::string> hash_lfu(CAPACITY, 4); // 假设分片数量=4
+    KamaCache::KLruKCache<int, std::string> lruk(CAPACITY, historyCapacity1, k1); // 假设 historyCapacity=10, k=3
+    KamaCache::KHashLruCaches<int, std::string> hash_lru(CAPACITY, sliceNum); // 假设分片数量=4
+    KamaCache::KHashLruKCache<int, std::string> hash_lruk(CAPACITY, 10, historyCapacity2, k2); // 假设 historyCapacity=10, k=3, 分片数量=4
+    KamaCache::KHashLfuCache<int, std::string> hash_lfu(CAPACITY, sliceNum); // 假设分片数量=4
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -101,20 +98,17 @@ void testHotDataAccess() {
     printResults("热点数据访问测试", CAPACITY, get_operations, hits);
 }
 
-void testLoopPattern() {
+void testLoopPattern(const int CAPACITY, const int LOOP_SIZE,const int OPERATIONS,int sliceNum,const int k1,const int historyCapacity1,const int k2,const int historyCapacity2) {
     std::cout << "\n=== 测试场景2：循环扫描测试 ===" << std::endl;
     
-    const int CAPACITY = 50;  // 增加缓存容量
-    const int LOOP_SIZE = 500;         
-    const int OPERATIONS = 200000;  // 增加操作次数
     
     KamaCache::KLruCache<int, std::string> lru(CAPACITY);
     KamaCache::KLfuCache<int, std::string> lfu(CAPACITY);
     KamaCache::KArcCache<int, std::string> arc(CAPACITY);
-    KamaCache::KLruKCache<int, std::string> lruk(CAPACITY, 10, 3); // 假设 historyCapacity=10, k=3
-    KamaCache::KHashLruCaches<int, std::string> hash_lru(CAPACITY, 4); // 假设分片数量=4
-    KamaCache::KHashLruKCache<int, std::string> hash_lruk(CAPACITY, 10, 3, 4); // 假设 historyCapacity=10, k=3, 分片数量=4
-    KamaCache::KHashLfuCache<int, std::string> hash_lfu(CAPACITY, 4); // 假设分片数量=4
+    KamaCache::KLruKCache<int, std::string> lruk(CAPACITY, historyCapacity1, k1); // 假设 historyCapacity=10, k=3
+    KamaCache::KHashLruCaches<int, std::string> hash_lru(CAPACITY, sliceNum); // 假设分片数量=4
+    KamaCache::KHashLruKCache<int, std::string> hash_lruk(CAPACITY, 10, historyCapacity2, k2); // 假设 historyCapacity=10, k=3, 分片数量=4
+    KamaCache::KHashLfuCache<int, std::string> hash_lfu(CAPACITY, sliceNum); // 假设分片数量=4
 
     std::array<KamaCache::KICachePolicy<int, std::string>*, 7> caches = {&lru, &lfu, &arc, &lruk, &hash_lru, &hash_lruk, &hash_lfu};
     std::vector<int> hits(7, 0);
@@ -154,20 +148,17 @@ void testLoopPattern() {
     printResults("循环扫描测试", CAPACITY, get_operations, hits);
 }
 
-void testWorkloadShift() {
+void testWorkloadShift(const int CAPACITY, const int OPERATIONS,const int PHASE_LENGTH,int sliceNum,const int k1,const int historyCapacity1,const int k2,const int historyCapacity2) {
     std::cout << "\n=== 测试场景3：工作负载剧烈变化测试 ===" << std::endl;
-    
-    const int CAPACITY = 4;            
-    const int OPERATIONS = 80000;      
-    const int PHASE_LENGTH = OPERATIONS / 5;
+
     
     KamaCache::KLruCache<int, std::string> lru(CAPACITY);
     KamaCache::KLfuCache<int, std::string> lfu(CAPACITY);
     KamaCache::KArcCache<int, std::string> arc(CAPACITY);
-    KamaCache::KLruKCache<int, std::string> lruk(CAPACITY, 10, 3); // 假设 historyCapacity=10, k=3
-    KamaCache::KHashLruCaches<int, std::string> hash_lru(CAPACITY, 4); // 假设分片数量=4
-    KamaCache::KHashLruKCache<int, std::string> hash_lruk(CAPACITY, 10, 3, 4); // 假设 historyCapacity=10, k=3, 分片数量=4
-    KamaCache::KHashLfuCache<int, std::string> hash_lfu(CAPACITY, 4); // 假设分片数量=4
+    KamaCache::KLruKCache<int, std::string> lruk(CAPACITY, historyCapacity1, k1); // 假设 historyCapacity=10, k=3
+    KamaCache::KHashLruCaches<int, std::string> hash_lru(CAPACITY, sliceNum); // 假设分片数量=4
+    KamaCache::KHashLruKCache<int, std::string> hash_lruk(CAPACITY, 10, historyCapacity2, k2); // 假设 historyCapacity=10, k=3, 分片数量=4
+    KamaCache::KHashLfuCache<int, std::string> hash_lfu(CAPACITY, sliceNum); // 假设分片数量=4
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -223,9 +214,96 @@ void testWorkloadShift() {
     printResults("工作负载剧烈变化测试", CAPACITY, get_operations, hits);
 }
 
+void test1() {
+    std::cout<<std::endl<<"测试用例 1 - 标准负载"<<std::endl;
+
+    testHotDataAccess(50, 500000, 20, 5000, 4, 3, 10, 5, 10);  // 热点数据访问测试
+    testLoopPattern(50, 500, 200000, 4, 3, 10, 5, 10);          // 循环扫描测试
+    testWorkloadShift(50, 80000, 16000, 4, 3, 10, 5, 10);       // 工作负载变化测试
+}
+
+void test2() {
+    std::cout<<std::endl<<"测试用例 2 - 小容量高操作"<<std::endl;
+
+    testHotDataAccess(20, 1000000, 50, 10000, 4, 3, 5, 3, 5);  // 热点数据访问测试
+    testLoopPattern(20, 200, 100000, 4, 3, 5, 3, 5);           // 循环扫描测试
+    testWorkloadShift(20, 60000, 12000, 4, 3, 5, 3, 5);        // 工作负载变化测试
+}
+
+void test3() {
+    std::cout<<std::endl<<"测试用例 3 - 大容量低操作"<<std::endl;
+
+    testHotDataAccess(200, 200000, 40, 3000, 4, 4, 15, 6, 15);  // 热点数据访问测试
+    testLoopPattern(200, 1000, 50000, 4, 4, 15, 6, 15);         // 循环扫描测试
+    testWorkloadShift(200, 30000, 6000, 4, 4, 15, 6, 15);       // 工作负载变化测试
+}
+
+void test4() {
+    std::cout<<std::endl<<"测试用例 4 - 高热点比例"<<std::endl;
+
+    testHotDataAccess(100, 500000, 100, 2000, 4, 3, 10, 5, 10);  // 热点数据访问测试
+    testLoopPattern(100, 500, 200000, 4, 3, 10, 5, 10);          // 循环扫描测试
+    testWorkloadShift(100, 80000, 16000, 4, 3, 10, 5, 10);       // 工作负载变化测试
+}
+
+void test5() {
+    std::cout<<std::endl<<"测试用例 5 - 高冷数据比例"<<std::endl;
+
+    testHotDataAccess(50, 500000, 10, 10000, 4, 3, 10, 5, 10);   // 热点数据访问测试
+    testLoopPattern(50, 500, 200000, 4, 3, 10, 5, 10);           // 循环扫描测试
+    testWorkloadShift(50, 80000, 16000, 4, 3, 10, 5, 10);        // 工作负载变化测试
+}
+
+void test6() {
+    std::cout<<std::endl<<"测试用例 6 - 大容量高操作"<<std::endl;
+
+    testHotDataAccess(500, 1000000, 100, 10000, 4, 4, 20, 7, 20);  // 热点数据访问测试
+    testLoopPattern(500, 2000, 100000, 4, 4, 20, 7, 20);          // 循环扫描测试
+    testWorkloadShift(500, 40000, 8000, 4, 4, 20, 7, 20);         // 工作负载变化测试
+}
+
+void test7() {
+    std::cout<<std::endl<<"测试用例 7 - 高频率变化"<<std::endl;
+
+    testHotDataAccess(50, 500000, 50, 2000, 4, 2, 5, 3, 5);  // 热点数据访问测试
+    testLoopPattern(50, 500, 500000, 4, 2, 5, 3, 5);         // 循环扫描测试
+    testWorkloadShift(50, 200000, 50000, 4, 2, 5, 3, 5);     // 工作负载变化测试
+}
+
+void test8() {
+    std::cout<<std::endl<<"测试用例 8 - 长时间访问测试"<<std::endl;
+
+    testHotDataAccess(150, 1000000, 30, 5000, 4, 5, 15, 7, 15);   // 热点数据访问测试
+    testLoopPattern(150, 1000, 500000, 4, 5, 15, 7, 15);           // 循环扫描测试
+    testWorkloadShift(150, 200000, 50000, 4, 5, 15, 7, 15);        // 工作负载变化测试
+}
+
+void test9() {
+    std::cout<<std::endl<<"测试用例 9 - 高并发访问"<<std::endl;
+    testHotDataAccess(200, 1000000, 50, 5000, 8, 3, 10, 5, 10);  // 热点数据访问测试
+    testLoopPattern(200, 1000, 100000, 8, 3, 10, 5, 10);         // 循环扫描测试
+    testWorkloadShift(200, 200000, 50000, 8, 3, 10, 5, 10);       // 工作负载变化测试
+}
+
+void test10() {
+    std::cout<<std::endl<<"测试用例 10 - 更长操作次数与更低容量"<<std::endl;
+    testHotDataAccess(30, 2000000, 20, 2000, 4, 3, 8, 4, 8);  // 热点数据访问测试
+    testLoopPattern(30, 500, 2000000, 4, 3, 8, 4, 8);         // 循环扫描测试
+    testWorkloadShift(30, 1000000, 250000, 4, 3, 8, 4, 8);     // 工作负载变化测试
+}
+
+
 int main() {
-    testHotDataAccess();
-    testLoopPattern();
-    testWorkloadShift();
+    test1();
+    test2();
+    test3();
+    test4();
+    test5();
+    test6();
+    test7();
+    test8();
+    test9();
+    test10();
+
     return 0;
 }
